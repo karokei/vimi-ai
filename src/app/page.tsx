@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   Sparkles,
   Film,
@@ -8,49 +9,17 @@ import {
   Clapperboard,
   ArrowRight,
   Play,
+  Layers,
 } from "lucide-react";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-midnight-abyss relative overflow-hidden">
-      {/* === Atmospheric Background Effects === */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        aria-hidden="true"
-      >
-        {/* Radial glow top-left */}
-        <div
-          className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full opacity-20"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(0,229,255,0.15) 0%, transparent 70%)",
-          }}
-        />
-        {/* Radial glow bottom-right */}
-        <div
-          className="absolute -bottom-60 -right-60 w-[800px] h-[800px] rounded-full opacity-15"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(45,212,191,0.12) 0%, transparent 70%)",
-          }}
-        />
-        {/* Pink accent center */}
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full opacity-10"
-          style={{
-            background:
-              "radial-gradient(circle, rgba(255,0,127,0.1) 0%, transparent 70%)",
-          }}
-        />
-      </div>
-
-      {/* === Navbar === */}
-      <nav className="relative z-10 flex items-center justify-between px-6 lg:px-12 py-5">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-cyan to-vivid-teal flex items-center justify-center neon-glow-cyan transition-transform group-hover:scale-105">
-            <Play className="w-5 h-5 text-midnight-abyss fill-current" />
-          </div>
-          <span className="text-2xl font-bold font-[family-name:var(--font-heading)] gradient-text-primary">
+    <div className="min-h-screen bg-background relative overflow-hidden font-body">
+      {/* === Professional Navbar === */}
+      <nav className="relative z-50 flex items-center justify-between px-6 lg:px-12 py-5 border-b border-white/5 bg-background/80 backdrop-blur-md">
+        <Link href="/" className="flex items-center gap-3 group">
+          <Image src="/logo.png" alt="VimiAI Logo" width={32} height={32} unoptimized className="group-hover:opacity-80 transition-opacity" />
+          <span className="text-xl font-bold font-heading tracking-tight text-white">
             VimiAI
           </span>
         </Link>
@@ -58,123 +27,148 @@ export default function LandingPage() {
         <div className="flex items-center gap-4">
           <Link
             href="/login"
-            className="btn-ghost text-sm px-5 py-2.5"
-            aria-label="Đăng nhập vào VimiAI"
+            className="btn-ghost text-sm px-5 py-2"
+            aria-label="Đăng nhập"
           >
-            Đăng nhập
+            Log in
           </Link>
           <Link
             href="/signup"
-            className="btn-primary text-sm px-5 py-2.5 flex items-center gap-2"
-            aria-label="Đăng ký tài khoản VimiAI"
+            className="btn-primary text-sm px-5 py-2"
+            aria-label="Đăng ký tài khoản"
           >
-            <Sparkles className="w-4 h-4" />
-            Bắt đầu ngay
+            Start Free Trial
           </Link>
         </div>
       </nav>
 
-      {/* === Hero Section === */}
-      <section className="relative z-10 px-6 lg:px-12 pt-16 lg:pt-24 pb-20">
-        <div className="max-w-6xl mx-auto text-center">
+      {/* === Video-First Hero Section === */}
+      <section className="relative z-10 px-6 lg:px-12 pt-20 lg:pt-32 pb-24">
+        {/* Abstract Glows */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[600px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 glass rounded-full px-5 py-2 mb-8 animate-fade-in">
-            <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse" />
-            <span className="text-sm text-muted-silver">
-              Powered by Google Gemini AI
+          <div className="inline-flex items-center gap-2 border border-white/10 rounded-full px-4 py-1.5 mb-8 bg-white/5 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+            <span className="text-xs font-medium text-muted tracking-wide uppercase">
+              The Next-Gen Video Production Platform
             </span>
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl lg:text-7xl font-extrabold font-[family-name:var(--font-heading)] tracking-tight leading-tight mb-6 animate-slide-up">
-            <span className="text-pure-white">Biến tiểu thuyết</span>
-            <br />
-            <span className="gradient-text-hot">thành phim AI</span>
+          <h1 className="text-5xl lg:text-7xl font-bold font-heading tracking-tight leading-[1.1] mb-6 text-white max-w-4xl">
+            Create cinematic videos <br className="hidden md:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-primary">
+              at the speed of thought.
+            </span>
           </h1>
 
           {/* Subtitle */}
-          <p
-            className="text-lg lg:text-xl text-muted-silver max-w-2xl mx-auto mb-10 animate-slide-up"
-            style={{ animationDelay: "0.1s" }}
-          >
-            Nền tảng AI Video Studio dành cho creators Việt Nam. Từ kịch bản →
-            nhân vật → phân cảnh → lồng tiếng → video — tất cả bằng AI.
+          <p className="text-lg text-muted max-w-2xl mb-10 leading-relaxed">
+            VimiAI is the ultimate creative suite for modern storytellers. Transform your ideas into broadcast-quality videos with an unparalleled suite of intelligent creation tools.
           </p>
 
           {/* CTA Buttons */}
-          <div
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-slide-up"
-            style={{ animationDelay: "0.2s" }}
-          >
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
             <Link
               href="/signup"
-              className="btn-secondary text-lg px-8 py-4 flex items-center gap-3 rounded-2xl"
-              aria-label="Bắt đầu tạo video với VimiAI"
+              className="bg-primary hover:bg-[#1456A3] text-white text-lg font-medium px-8 py-4 rounded-md transition-colors flex items-center gap-2"
             >
-              <Clapperboard className="w-5 h-5" />
-              Tạo Video Ngay
+              Start Creating Now
               <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link
+              href="#features"
+              className="bg-surface hover:bg-card border border-white/10 text-white text-lg font-medium px-8 py-4 rounded-md transition-colors flex items-center gap-2"
+            >
+              <Play className="w-5 h-5" />
+              Watch Demo
             </Link>
           </div>
 
-          {/* === Feature Cards === */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {/* Editor Interface Mockup */}
+          <div className="w-full max-w-6xl relative mx-auto group">
+            <div className="absolute -inset-1 bg-gradient-to-b from-primary/30 to-transparent rounded-xl blur opacity-50"></div>
+            <div className="relative rounded-xl overflow-hidden border border-white/10 shadow-2xl bg-surface aspect-video flex items-center justify-center">
+              {/* Using the OG Image as a placeholder for the beautiful dashboard interface */}
+              <Image
+                src="/og-image.png"
+                alt="VimiAI Studio Interface"
+                fill
+                className="object-cover"
+                unoptimized
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 text-white flex items-center justify-center transition-all cursor-pointer">
+                <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 hover:scale-110 transition-transform">
+                  <Play className="w-8 h-8 ml-1 fill-white/80" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* === Features Grid === */}
+      <section id="features" className="relative z-10 px-6 lg:px-12 py-24 bg-surface/50 border-t border-white/5">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold font-heading text-white mb-4">
+              Everything you need to produce a masterpiece.
+            </h2>
+            <p className="text-muted text-lg max-w-2xl mx-auto">
+              A comprehensive studio environment that consolidates scriptwriting, asset management, storyboarding, and timeline editing.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FeatureCard
-              icon={<Wand2 className="w-6 h-6" />}
-              title="Nano Banana 2"
-              description="Tạo hình nhân vật & bối cảnh AI với chất lượng 4K, phong cách tùy chọn."
-              color="cyan"
-              delay="0.3s"
+              icon={<Layers className="w-6 h-6 text-primary" />}
+              title="End-to-end Pipeline"
+              description="A 7-stage coherent workflow from a blank white page to a final rendered 4K video."
             />
             <FeatureCard
-              icon={<Film className="w-6 h-6" />}
-              title="Veo 3.1"
-              description="Chuyển đổi hình ảnh thành video cinematic với âm thanh tự nhiên."
-              color="pink"
-              delay="0.4s"
+              icon={<Wand2 className="w-6 h-6 text-accent" />}
+              title="Intelligent Storyboarding"
+              description="Automatic breakdown of scripts into highly detailed visual panels and camera directions."
             />
             <FeatureCard
-              icon={<Mic2 className="w-6 h-6" />}
-              title="Gemini TTS"
-              description="Lồng tiếng AI đa ngôn ngữ, kiểm soát cảm xúc và giọng nói."
-              color="cyan"
-              delay="0.5s"
+              icon={<Film className="w-6 h-6 text-primary" />}
+              title="Cinematic Asset Hub"
+              description="Manage characters, environments, and visual styles consistently across your entire project."
             />
             <FeatureCard
-              icon={<Sparkles className="w-6 h-6" />}
-              title="Phân tích kịch bản"
-              description="AI tự động chia tập, phân cảnh, nhận diện nhân vật và bối cảnh."
-              color="cyan"
-              delay="0.6s"
+              icon={<Mic2 className="w-6 h-6 text-accent" />}
+              title="Dynamic Voice Studio"
+              description="Infuse emotion into your story with multi-lingual, highly expressive voice generation."
             />
             <FeatureCard
-              icon={<Music className="w-6 h-6" />}
-              title="Lyria Music"
-              description="Tạo nhạc nền AI phù hợp với từng cảnh phim tự động."
-              color="pink"
-              delay="0.7s"
+              icon={<Music className="w-6 h-6 text-primary" />}
+              title="Ambient Soundscapes"
+              description="Auto-generate and layer background scores that adapt perfectly to the mood of the scene."
             />
             <FeatureCard
-              icon={<Clapperboard className="w-6 h-6" />}
-              title="7 Giai đoạn"
-              description="Pipeline hoàn chỉnh từ tiểu thuyết đến video xuất bản."
-              color="cyan"
-              delay="0.8s"
+              icon={<Clapperboard className="w-6 h-6 text-accent" />}
+              title="Pro Timeline Editor"
+              description="Fine-tune every frame, transition, and track in our browser-based, high-performance editor."
             />
           </div>
         </div>
       </section>
 
       {/* === Footer === */}
-      <footer className="relative z-10 border-t border-muted-silver/10 px-6 lg:px-12 py-8">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="relative z-10 border-t border-white/10 bg-background px-6 lg:px-12 py-12">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3 text-white">
+            <Image src="/logo.png" alt="Logo" width={24} height={24} unoptimized />
+            <span className="font-bold tracking-tight">VimiAI</span>
+          </div>
           <p className="text-sm text-dim-gray">
-            © 2026 VimiAI. Đón đầu xu hướng — Nâng tầm sáng tạo.
+            © 2026 VimiAI Studio. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <span className="text-sm text-muted-silver">
-              🇻🇳 Made for Vietnamese Creators
-            </span>
+            <Link href="#" className="text-sm text-muted hover:text-white transition-colors">Privacy</Link>
+            <Link href="#" className="text-sm text-muted hover:text-white transition-colors">Terms of Service</Link>
           </div>
         </div>
       </footer>
@@ -187,49 +181,22 @@ function FeatureCard({
   icon,
   title,
   description,
-  color,
-  delay,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
-  color: "cyan" | "pink" | "teal";
-  delay: string;
 }) {
-  const colorMap = {
-    cyan: {
-      iconBg: "bg-neon-cyan/10",
-      iconColor: "text-neon-cyan",
-      glow: "neon-glow-cyan",
-    },
-    pink: {
-      iconBg: "bg-electric-pink/10",
-      iconColor: "text-electric-pink",
-      glow: "neon-glow-pink",
-    },
-    teal: {
-      iconBg: "bg-vivid-teal/10",
-      iconColor: "text-vivid-teal",
-      glow: "neon-glow-teal",
-    },
-  };
-
-  const colors = colorMap[color];
-
   return (
-    <div
-      className="card-clay p-6 text-left animate-slide-up"
-      style={{ animationDelay: delay }}
-    >
-      <div
-        className={`w-12 h-12 rounded-xl ${colors.iconBg} ${colors.iconColor} flex items-center justify-center mb-4 ${colors.glow}`}
-      >
+    <div className="bg-card border border-white/5 rounded-md p-8 hover:border-white/10 transition-colors group">
+      <div className="w-12 h-12 rounded-md bg-background border border-white/5 flex items-center justify-center mb-6 shadow-sm group-hover:scale-105 transition-transform">
         {icon}
       </div>
-      <h3 className="text-lg font-semibold font-[family-name:var(--font-heading)] text-pure-white mb-2">
+      <h3 className="text-xl font-bold font-heading text-white mb-3">
         {title}
       </h3>
-      <p className="text-sm text-muted-silver leading-relaxed">{description}</p>
+      <p className="text-muted leading-relaxed">
+        {description}
+      </p>
     </div>
   );
 }
