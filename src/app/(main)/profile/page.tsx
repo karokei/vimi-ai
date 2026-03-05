@@ -5,10 +5,23 @@ import { createClient } from '@/lib/supabase/client';
 import { User, Key, Save, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+interface UserProfile {
+    id: string;
+    display_name: string | null;
+    avatar_url: string | null;
+    updated_at: string;
+}
+
+interface UserPreference {
+    id: string;
+    google_ai_key: string | null;
+    default_model_config: Record<string, unknown> | null;
+    updated_at: string;
+}
+
 export default function ProfilePage() {
     const supabase = createClient();
-    const [profile, setProfile] = React.useState<any>(null);
-    const [prefs, setPrefs] = React.useState<any>(null);
+    const [profile, setProfile] = React.useState<UserProfile | null>(null);
     const [loading, setLoading] = React.useState(true);
     const [saving, setSaving] = React.useState(false);
 
@@ -21,17 +34,17 @@ export default function ProfilePage() {
             if (!user) return;
 
             const [pRes, prefRes] = await Promise.all([
-                supabase.from('profiles').select('*').eq('id', user.id).single(),
-                supabase.from('user_preferences').select('*').eq('id', user.id).single(),
+                supabase.from('profiles').select('id, display_name, avatar_url, updated_at').eq('id', user.id).single(),
+                supabase.from('user_preferences').select('id, google_ai_key, updated_at').eq('id', user.id).single(),
             ]);
 
             if (pRes.data) {
-                setProfile(pRes.data);
+                setProfile(pRes.data as UserProfile);
                 setDisplayName(pRes.data.display_name || '');
             }
             if (prefRes.data) {
-                setPrefs(prefRes.data);
-                setApiKey(prefRes.data.google_ai_key || '');
+                const prefsData = prefRes.data as UserPreference;
+                setApiKey(prefsData.google_ai_key || '');
             }
             setLoading(false);
         }
@@ -56,8 +69,9 @@ export default function ProfilePage() {
 
             if (pErr || prefErr) throw pErr || prefErr;
             toast.success('Đã cập nhật Profile thành công!');
-        } catch (error: any) {
-            toast.error('Lỗi khi cập nhật: ' + error.message);
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Unknown error';
+            toast.error('Lỗi khi cập nhật: ' + message);
         } finally {
             setSaving(false);
         }
@@ -74,7 +88,7 @@ export default function ProfilePage() {
     return (
         <div className="max-w-4xl space-y-10 animate-fade-in">
             <div>
-                <h2 className="text-3xl font-black font-heading gradient-text-primary mb-2">User Profile</h2>
+                <h2 className="text-3xl font-black font-heading tracking-tight gradient-text-primary mb-2">User Profile</h2>
                 <p className="text-muted-silver">Quản lý thông tin cá nhân và cấu hình AI của bạn.</p>
             </div>
 
@@ -88,8 +102,9 @@ export default function ProfilePage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-muted-silver ml-1">Email</label>
+                            <label htmlFor="email" className="text-sm font-semibold text-muted-silver ml-1">Email</label>
                             <input
+                                id="email"
                                 type="text"
                                 disabled
                                 value={profile?.id ? profile.id : 'Loading...'}
@@ -99,8 +114,9 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-muted-silver ml-1">Tên hiển thị</label>
+                            <label htmlFor="display_name" className="text-sm font-semibold text-muted-silver ml-1">Tên hiển thị</label>
                             <input
+                                id="display_name"
                                 type="text"
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
@@ -115,28 +131,29 @@ export default function ProfilePage() {
                 <section className="card-clay p-8 space-y-6 border-neon-cyan/10">
                     <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-2">
                         <div className="flex items-center gap-3">
-                            <Key className="w-5 h-5 text-vivid-violet" />
+                            <Key className="w-5 h-5 text-vivid-teal" />
                             <h3 className="text-lg font-bold font-heading">Google AI configuration</h3>
                         </div>
-                        <span className="text-[10px] font-bold px-2 py-1 rounded bg-vivid-violet/20 text-vivid-violet uppercase tracking-wider">
+                        <span className="text-[10px] font-bold px-2 py-1 rounded bg-vivid-teal/20 text-vivid-teal uppercase tracking-wider">
                             Gemini 3.1 Ready
                         </span>
                     </div>
 
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-muted-silver ml-1">Google AI API Key</label>
+                            <label htmlFor="api_key" className="text-sm font-semibold text-muted-silver ml-1">Google AI API Key</label>
                             <input
+                                id="api_key"
                                 type="password"
                                 value={apiKey}
                                 onChange={(e) => setApiKey(e.target.value)}
                                 placeholder="Nhập API Key của bạn..."
-                                className="input-dark w-full border-vivid-violet/20 focus:border-vivid-violet"
+                                className="input-dark w-full border-vivid-teal/20 focus:border-vivid-teal"
                             />
                         </div>
 
-                        <div className="p-4 rounded-xl bg-vivid-violet/5 border border-vivid-violet/10 flex gap-4">
-                            <AlertCircle className="w-5 h-5 text-vivid-violet shrink-0" />
+                        <div className="p-4 rounded-xl bg-vivid-teal/5 border border-vivid-teal/10 flex gap-4">
+                            <AlertCircle className="w-5 h-5 text-vivid-teal shrink-0" />
                             <p className="text-xs text-muted-silver leading-relaxed">
                                 API Key này sẽ được sử dụng để gọi các model **Gemini 3.1 Pro/Flash**, **Veo 3.1** và **Lyria**.
                                 Chúng tôi lưu trữ key này để bạn không phải nhập lại mỗi lần tạo video.

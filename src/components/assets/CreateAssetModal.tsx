@@ -3,7 +3,7 @@
 import React from 'react';
 import Modal from '@/components/ui/Modal';
 import { createClient } from '@/lib/supabase/client';
-import { User, MapPin, Mic, Save, Sparkles, Upload } from 'lucide-react';
+import { User, MapPin, Mic, Save, Upload } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface CreateAssetModalProps {
@@ -11,6 +11,14 @@ interface CreateAssetModalProps {
     onClose: () => void;
     onSuccess: () => void;
     type: 'character' | 'location' | 'voice';
+}
+
+interface AssetPayload {
+    name: string;
+    description: string;
+    user_id: string | undefined;
+    voice_id?: string;
+    provider?: string;
 }
 
 export default function CreateAssetModal({ isOpen, onClose, onSuccess, type }: CreateAssetModalProps) {
@@ -27,7 +35,7 @@ export default function CreateAssetModal({ isOpen, onClose, onSuccess, type }: C
         const { data: { user } } = await supabase.auth.getUser();
 
         let table = '';
-        let payload: any = { name, description, user_id: user?.id };
+        let payload: AssetPayload = { name, description, user_id: user?.id };
 
         if (type === 'character') table = 'global_characters';
         else if (type === 'location') table = 'global_locations';

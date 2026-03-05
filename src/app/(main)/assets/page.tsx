@@ -8,19 +8,28 @@ import {
     Mic,
     Plus,
     Search,
-    Video,
     Trash2,
     UserCircle
 } from 'lucide-react';
 import CreateAssetModal from '@/components/assets/CreateAssetModal';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 type TabType = 'characters' | 'locations' | 'voices';
+
+interface Asset {
+    id: string;
+    name: string;
+    description: string | null;
+    avatar_url?: string;
+    image_url?: string;
+    created_at: string;
+}
 
 export default function AssetsPage() {
     const [activeTab, setActiveTab] = React.useState<TabType>('characters');
     const [isModalOpen, setIsModalOpen] = React.useState(false);
-    const [assets, setAssets] = React.useState<any[]>([]);
+    const [assets, setAssets] = React.useState<Asset[]>([]);
     const [loading, setLoading] = React.useState(true);
     const supabase = createClient();
 
@@ -31,8 +40,10 @@ export default function AssetsPage() {
         else if (activeTab === 'locations') table = 'global_locations';
         else table = 'global_voices';
 
-        const { data } = await supabase.from(table).select('*').order('created_at', { ascending: false });
-        if (data) setAssets(data);
+        const { data } = await supabase.from(table)
+            .select('id, name, description, avatar_url, image_url, created_at')
+            .order('created_at', { ascending: false });
+        if (data) setAssets(data as Asset[]);
         setLoading(false);
     }, [activeTab, supabase]);
 
@@ -69,7 +80,7 @@ export default function AssetsPage() {
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={fetchAssets}
-                type={activeTab.slice(0, -1) as any}
+                type={activeTab.slice(0, -1) as 'character' | 'location' | 'voice'}
             />
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -124,9 +135,14 @@ export default function AssetsPage() {
                     {assets.map((asset) => (
                         <div key={asset.id} className="card-clay group relative overflow-hidden flex flex-col">
                             {/* Image Preview / Placeholder */}
-                            <div className="aspect-square bg-midnight-abyss flex items-center justify-center p-6 border-b border-white/5 relative overflow-hidden">
+                            <div className="aspect-square bg-midnight-abyss flex items-center justify-center border-b border-white/5 relative overflow-hidden">
                                 {asset.avatar_url || asset.image_url ? (
-                                    <img src={asset.avatar_url || asset.image_url} alt={asset.name} className="w-full h-full object-cover" />
+                                    <Image
+                                        src={(asset.avatar_url || asset.image_url) as string}
+                                        alt={asset.name}
+                                        fill
+                                        className="object-cover"
+                                    />
                                 ) : (
                                     <div className="w-full h-full rounded-2xl bg-gradient-to-br from-white/5 to-transparent flex items-center justify-center">
                                         {activeTab === 'characters' ? (
@@ -140,7 +156,7 @@ export default function AssetsPage() {
                                 {/* Delete overlay */}
                                 <button
                                     onClick={() => handleDelete(asset.id)}
-                                    className="absolute top-2 right-2 p-2 rounded-lg bg-destructive/10 text-destructive opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-white"
+                                    className="absolute top-2 right-2 p-2 rounded-lg bg-black/60 text-destructive opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive hover:text-white z-10"
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </button>

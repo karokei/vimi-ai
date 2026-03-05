@@ -118,7 +118,7 @@ export default function SignupPage() {
                     href="/"
                     className="flex items-center justify-center gap-2 mb-10 group"
                 >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-cyan to-vivid-violet flex items-center justify-center neon-glow-cyan transition-transform group-hover:scale-105">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-cyan to-vivid-teal flex items-center justify-center neon-glow-cyan transition-transform group-hover:scale-105">
                         <Play className="w-6 h-6 text-midnight-abyss fill-current" />
                     </div>
                     <span className="text-3xl font-bold font-[family-name:var(--font-heading)] gradient-text-primary">

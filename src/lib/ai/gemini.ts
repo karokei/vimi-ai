@@ -67,6 +67,26 @@ export async function generateText(
     return response.text;
 }
 
+/**
+ * Generate an image using Nano Banana 2 (Gemini 3.1 Flash Image Preview)
+ * Returns the base64 data of the generated image.
+ */
+export async function generateImage(prompt: string): Promise<string> {
+    const response = await ai.models.generateContent({
+        model: MODELS.IMAGE,
+        contents: prompt
+    });
+
+    // In Gemini 3.1 SDK, generated images are in the parts as inlineData
+    // We navigate the response object correctly
+    const part = response.candidates?.[0]?.content?.parts?.[0];
+    if (part?.inlineData?.data) {
+        return part.inlineData.data;
+    }
+
+    throw new Error('No image data found in AI response');
+}
+
 // === Helper: Generate structured JSON ===
 export async function generateJSON<T>(
     prompt: string,

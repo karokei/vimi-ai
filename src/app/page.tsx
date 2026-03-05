@@ -31,7 +31,7 @@ export default function LandingPage() {
           className="absolute -bottom-60 -right-60 w-[800px] h-[800px] rounded-full opacity-15"
           style={{
             background:
-              "radial-gradient(circle, rgba(138,43,226,0.12) 0%, transparent 70%)",
+              "radial-gradient(circle, rgba(45,212,191,0.12) 0%, transparent 70%)",
           }}
         />
         {/* Pink accent center */}
@@ -47,7 +47,7 @@ export default function LandingPage() {
       {/* === Navbar === */}
       <nav className="relative z-10 flex items-center justify-between px-6 lg:px-12 py-5">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-cyan to-vivid-violet flex items-center justify-center neon-glow-cyan transition-transform group-hover:scale-105">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-cyan to-vivid-teal flex items-center justify-center neon-glow-cyan transition-transform group-hover:scale-105">
             <Play className="w-5 h-5 text-midnight-abyss fill-current" />
           </div>
           <span className="text-2xl font-bold font-[family-name:var(--font-heading)] gradient-text-primary">
@@ -86,7 +86,7 @@ export default function LandingPage() {
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl lg:text-7xl font-extrabold font-[family-name:var(--font-heading)] leading-tight mb-6 animate-slide-up">
+          <h1 className="text-5xl lg:text-7xl font-extrabold font-[family-name:var(--font-heading)] tracking-tight leading-tight mb-6 animate-slide-up">
             <span className="text-pure-white">Biến tiểu thuyết</span>
             <br />
             <span className="gradient-text-hot">thành phim AI</span>
@@ -137,7 +137,7 @@ export default function LandingPage() {
               icon={<Mic2 className="w-6 h-6" />}
               title="Gemini TTS"
               description="Lồng tiếng AI đa ngôn ngữ, kiểm soát cảm xúc và giọng nói."
-              color="violet"
+              color="cyan"
               delay="0.5s"
             />
             <FeatureCard
@@ -158,7 +158,7 @@ export default function LandingPage() {
               icon={<Clapperboard className="w-6 h-6" />}
               title="7 Giai đoạn"
               description="Pipeline hoàn chỉnh từ tiểu thuyết đến video xuất bản."
-              color="violet"
+              color="cyan"
               delay="0.8s"
             />
           </div>
@@ -193,7 +193,7 @@ function FeatureCard({
   icon: React.ReactNode;
   title: string;
   description: string;
-  color: "cyan" | "pink" | "violet";
+  color: "cyan" | "pink" | "teal";
   delay: string;
 }) {
   const colorMap = {
@@ -207,10 +207,10 @@ function FeatureCard({
       iconColor: "text-electric-pink",
       glow: "neon-glow-pink",
     },
-    violet: {
-      iconBg: "bg-vivid-violet/10",
-      iconColor: "text-vivid-violet",
-      glow: "neon-glow-violet",
+    teal: {
+      iconBg: "bg-vivid-teal/10",
+      iconColor: "text-vivid-teal",
+      glow: "neon-glow-teal",
     },
   };
 

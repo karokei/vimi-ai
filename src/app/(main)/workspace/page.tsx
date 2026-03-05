@@ -6,20 +6,31 @@ import { Plus, Video, Clock, ChevronRight, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import CreateProjectModal from '@/components/workspace/CreateProjectModal';
+import Image from 'next/image';
+
+interface Project {
+    id: string;
+    name: string;
+    description: string | null;
+    mode: string;
+    status: string;
+    thumbnail_url: string | null;
+    updated_at: string;
+}
 
 export default function WorkspacePage() {
     const supabase = createClient();
-    const [projects, setProjects] = React.useState<any[]>([]);
+    const [projects, setProjects] = React.useState<Project[]>([]);
     const [loading, setLoading] = React.useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
 
     const fetchProjects = React.useCallback(async () => {
         const { data } = await supabase
             .from('projects')
-            .select('*')
+            .select('id, name, description, mode, status, thumbnail_url, updated_at')
             .order('updated_at', { ascending: false });
 
-        if (data) setProjects(data);
+        if (data) setProjects(data as Project[]);
         setLoading(false);
     }, [supabase]);
 
@@ -111,11 +122,16 @@ export default function WorkspacePage() {
                             {/* Thumbnail Placeholder */}
                             <div className="aspect-video rounded-xl bg-midnight-abyss border border-white/5 flex items-center justify-center relative overflow-hidden">
                                 {project.thumbnail_url ? (
-                                    <img src={project.thumbnail_url} alt={project.name} className="w-full h-full object-cover" />
+                                    <Image
+                                        src={project.thumbnail_url}
+                                        alt={project.name}
+                                        fill
+                                        className="object-cover"
+                                    />
                                 ) : (
                                     <Video className="w-8 h-8 text-dim-gray/30" />
                                 )}
-                                <div className="absolute top-3 right-3 px-2 py-1 rounded-md bg-black/60 backdrop-blur-md text-[10px] font-bold text-neon-cyan uppercase tracking-wider border border-white/10">
+                                <div className="absolute top-3 right-3 px-2 py-1 rounded-md bg-black/60 backdrop-blur-md text-[10px] font-bold text-neon-cyan uppercase tracking-wider border border-white/10 z-10">
                                     {project.status}
                                 </div>
                             </div>

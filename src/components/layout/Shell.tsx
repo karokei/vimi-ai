@@ -10,10 +10,8 @@ import {
     LogOut,
     Video,
     Image as ImageIcon,
-    Music,
     ChevronRight,
     Menu,
-    X
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
@@ -63,7 +61,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 <div className="h-full flex flex-col p-6">
                     {/* Logo */}
                     <div className="flex items-center gap-3 mb-10 px-2">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-cyan to-vivid-violet flex items-center justify-center shadow-neon-cyan animate-pulse-neon">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-neon-cyan to-vivid-teal flex items-center justify-center shadow-neon-cyan animate-pulse-neon">
                             <Video className="w-6 h-6 text-midnight-abyss" strokeWidth={2.5} />
                         </div>
                         <span className="text-2xl font-black font-heading tracking-tight gradient-text-primary">
@@ -80,6 +78,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                                 <Link
                                     key={item.name}
                                     href={item.href}
+                                    aria-label={`Navigate to ${item.name}`}
                                     className={`
                     flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
                     ${isActive
@@ -102,6 +101,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                                 <Link
                                     key={item.name}
                                     href={item.href}
+                                    aria-label={`Go to ${item.name}`}
                                     className={`
                     flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
                     ${isActive
@@ -121,6 +121,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     <div className="mt-auto pt-6 border-t border-white/5">
                         <button
                             onClick={handleSignOut}
+                            aria-label="Sign out of your account"
                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-destructive hover:bg-destructive/10 transition-all duration-200"
                         >
                             <LogOut className="w-5 h-5" />
@@ -137,6 +138,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                     <button
                         className="lg:hidden p-2 text-muted-silver"
                         onClick={() => setIsSidebarOpen(true)}
+                        aria-label="Open sidebar menu"
                     >
                         <Menu className="w-6 h-6" />
                     </button>
@@ -154,7 +156,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                             </div>
                         </div>
                         <div className="h-10 w-10 rounded-full bg-matte-clay border border-white/10 overflow-hidden">
-                            <div className="w-full h-full bg-gradient-to-br from-neon-cyan/20 to-vivid-violet/20" />
+                            <div className="w-full h-full bg-gradient-to-br from-neon-cyan/20 to-vivid-teal/20" />
                         </div>
                     </div>
                 </header>
@@ -166,7 +168,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
                 {/* Atmospheric background glows */}
                 <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-neon-cyan/5 rounded-full blur-[120px] pointer-events-none -z-10" />
-                <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-vivid-violet/5 rounded-full blur-[120px] pointer-events-none -z-10" />
+                <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-vivid-teal/5 rounded-full blur-[120px] pointer-events-none -z-10" />
             </main>
         </div>
     );

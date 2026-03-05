@@ -3,7 +3,7 @@
 import React from 'react';
 import Modal from '@/components/ui/Modal';
 import { createClient } from '@/lib/supabase/client';
-import { Video, Type, FileText, Send, Sparkles } from 'lucide-react';
+import { Type, FileText, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface CreateProjectModalProps {
@@ -50,11 +50,12 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }: Creat
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-4">
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-dim-gray uppercase tracking-widest ml-1 flex items-center gap-2">
+                        <label htmlFor="project-name" className="text-xs font-bold text-dim-gray uppercase tracking-widest ml-1 flex items-center gap-2">
                             <Type className="w-3 h-3 text-neon-cyan" />
                             Project Name
                         </label>
                         <input
+                            id="project-name"
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -65,11 +66,12 @@ export default function CreateProjectModal({ isOpen, onClose, onSuccess }: Creat
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-dim-gray uppercase tracking-widest ml-1 flex items-center gap-2">
-                            <FileText className="w-3 h-3 text-vivid-violet" />
+                        <label htmlFor="project-desc" className="text-xs font-bold text-dim-gray uppercase tracking-widest ml-1 flex items-center gap-2">
+                            <FileText className="w-3 h-3 text-vivid-teal" />
                             Description (Optional)
                         </label>
                         <textarea
+                            id="project-desc"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Mô tả ngắn gọn về câu chuyện..."
