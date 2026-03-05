@@ -1,128 +1,174 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+'use client';
 
-export default async function ProfilePage() {
-    const supabase = await createClient();
-    const {
-        data: { user },
-    } = await supabase.auth.getUser();
+import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { User, Key, Save, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
-    if (!user) {
-        redirect("/login");
+export default function ProfilePage() {
+    const supabase = createClient();
+    const [profile, setProfile] = React.useState<any>(null);
+    const [prefs, setPrefs] = React.useState<any>(null);
+    const [loading, setLoading] = React.useState(true);
+    const [saving, setSaving] = React.useState(false);
+
+    const [displayName, setDisplayName] = React.useState('');
+    const [apiKey, setApiKey] = React.useState('');
+
+    React.useEffect(() => {
+        async function loadData() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
+            const [pRes, prefRes] = await Promise.all([
+                supabase.from('profiles').select('*').eq('id', user.id).single(),
+                supabase.from('user_preferences').select('*').eq('id', user.id).single(),
+            ]);
+
+            if (pRes.data) {
+                setProfile(pRes.data);
+                setDisplayName(pRes.data.display_name || '');
+            }
+            if (prefRes.data) {
+                setPrefs(prefRes.data);
+                setApiKey(prefRes.data.google_ai_key || '');
+            }
+            setLoading(false);
+        }
+        loadData();
+    }, [supabase]);
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSaving(true);
+        const { data: { user } } = await supabase.auth.getUser();
+
+        try {
+            const { error: pErr } = await supabase
+                .from('profiles')
+                .update({ display_name: displayName })
+                .eq('id', user?.id);
+
+            const { error: prefErr } = await supabase
+                .from('user_preferences')
+                .update({ google_ai_key: apiKey })
+                .eq('id', user?.id);
+
+            if (pErr || prefErr) throw pErr || prefErr;
+            toast.success('Đã cập nhật Profile thành công!');
+        } catch (error: any) {
+            toast.error('Lỗi khi cập nhật: ' + error.message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="w-8 h-8 border-2 border-neon-cyan border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
     }
 
-    const displayName =
-        user.user_metadata?.display_name || user.email?.split("@")[0] || "Creator";
-
     return (
-        <div className="min-h-screen bg-midnight-abyss px-6 lg:px-10 py-10">
-            <div className="max-w-3xl mx-auto">
-                <h1 className="text-3xl font-bold font-[family-name:var(--font-heading)] text-pure-white mb-8">
-                    Hồ sơ & Cài đặt
-                </h1>
+        <div className="max-w-4xl space-y-10 animate-fade-in">
+            <div>
+                <h2 className="text-3xl font-black font-heading gradient-text-primary mb-2">User Profile</h2>
+                <p className="text-muted-silver">Quản lý thông tin cá nhân và cấu hình AI của bạn.</p>
+            </div>
 
-                {/* Profile Section */}
-                <section className="card-clay p-8 mb-6">
-                    <h2 className="text-lg font-semibold font-[family-name:var(--font-heading)] text-pure-white mb-4">
-                        Thông tin cá nhân
-                    </h2>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-muted-silver mb-1">
-                                Tên hiển thị
-                            </label>
-                            <p className="text-pure-white">{displayName}</p>
+            <form onSubmit={handleSave} className="space-y-8">
+                {/* Basic Info */}
+                <section className="card-clay p-8 space-y-6">
+                    <div className="flex items-center gap-3 border-b border-white/5 pb-4 mb-2">
+                        <User className="w-5 h-5 text-neon-cyan" />
+                        <h3 className="text-lg font-bold font-heading">Thông tin cơ bản</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-muted-silver ml-1">Email</label>
+                            <input
+                                type="text"
+                                disabled
+                                value={profile?.id ? profile.id : 'Loading...'}
+                                className="input-dark w-full opacity-50 cursor-not-allowed"
+                            />
+                            <p className="text-[10px] text-dim-gray ml-1 italic">ID người dùng (Read-only)</p>
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-muted-silver mb-1">
-                                Email
-                            </label>
-                            <p className="text-pure-white">{user.email}</p>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-muted-silver ml-1">Tên hiển thị</label>
+                            <input
+                                type="text"
+                                value={displayName}
+                                onChange={(e) => setDisplayName(e.target.value)}
+                                placeholder="VD: Karo Kei"
+                                className="input-dark w-full"
+                            />
                         </div>
                     </div>
                 </section>
 
-                {/* API Keys Section */}
-                <section className="card-clay p-8 mb-6">
-                    <h2 className="text-lg font-semibold font-[family-name:var(--font-heading)] text-pure-white mb-4">
-                        🔑 Cấu hình API
-                    </h2>
-                    <p className="text-muted-silver text-sm mb-6">
-                        Cấu hình API key cho Google AI Gemini để sử dụng các tính năng AI.
-                    </p>
+                {/* AI Configuration */}
+                <section className="card-clay p-8 space-y-6 border-neon-cyan/10">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-2">
+                        <div className="flex items-center gap-3">
+                            <Key className="w-5 h-5 text-vivid-violet" />
+                            <h3 className="text-lg font-bold font-heading">Google AI configuration</h3>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-1 rounded bg-vivid-violet/20 text-vivid-violet uppercase tracking-wider">
+                            Gemini 3.1 Ready
+                        </span>
+                    </div>
 
                     <div className="space-y-4">
-                        <div>
-                            <label
-                                htmlFor="google-ai-key"
-                                className="block text-sm font-medium text-muted-silver mb-2"
-                            >
-                                Google AI API Key
-                            </label>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-muted-silver ml-1">Google AI API Key</label>
                             <input
-                                id="google-ai-key"
                                 type="password"
-                                placeholder="AIza••••••••••••••••"
-                                className="input-dark w-full"
-                                aria-label="Google AI API Key"
+                                value={apiKey}
+                                onChange={(e) => setApiKey(e.target.value)}
+                                placeholder="Nhập API Key của bạn..."
+                                className="input-dark w-full border-vivid-violet/20 focus:border-vivid-violet"
                             />
-                            <p className="text-xs text-dim-gray mt-1">
-                                Lấy API Key tại{" "}
-                                <a
-                                    href="https://aistudio.google.com"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-neon-cyan hover:underline"
-                                >
-                                    Google AI Studio
-                                </a>
+                        </div>
+
+                        <div className="p-4 rounded-xl bg-vivid-violet/5 border border-vivid-violet/10 flex gap-4">
+                            <AlertCircle className="w-5 h-5 text-vivid-violet shrink-0" />
+                            <p className="text-xs text-muted-silver leading-relaxed">
+                                API Key này sẽ được sử dụng để gọi các model **Gemini 3.1 Pro/Flash**, **Veo 3.1** và **Lyria**.
+                                Chúng tôi lưu trữ key này để bạn không phải nhập lại mỗi lần tạo video.
                             </p>
                         </div>
                     </div>
-                </section>
 
-                {/* Model Preferences */}
-                <section className="card-clay p-8">
-                    <h2 className="text-lg font-semibold font-[family-name:var(--font-heading)] text-pure-white mb-4">
-                        ⚙️ Tùy chọn Model
-                    </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <ModelPreference
-                            label="Phân tích văn bản"
-                            model="Gemini 3.1 Flash Lite"
-                        />
-                        <ModelPreference
-                            label="Tạo ảnh"
-                            model="Nano Banana 2"
-                        />
-                        <ModelPreference
-                            label="Chỉnh sửa ảnh"
-                            model="Nano Banana 2"
-                        />
-                        <ModelPreference
-                            label="Tạo video"
-                            model="Veo 3.1"
-                        />
-                        <ModelPreference label="Lồng tiếng TTS" model="Gemini TTS" />
-                        <ModelPreference label="Nhạc nền" model="Lyria" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
+                        {['Gemini 3.1 Flash', 'Nano Banana 2', 'Veo 3.1', 'Lyria Exp'].map(model => (
+                            <div key={model} className="p-3 rounded-lg bg-white/5 border border-white/5 text-center">
+                                <span className="text-[10px] text-dim-gray font-bold block mb-1 uppercase tracking-tighter">Verified Model</span>
+                                <span className="text-xs font-semibold text-pure-white">{model}</span>
+                            </div>
+                        ))}
                     </div>
                 </section>
-            </div>
-        </div>
-    );
-}
 
-function ModelPreference({
-    label,
-    model,
-}: {
-    label: string;
-    model: string;
-}) {
-    return (
-        <div className="bg-midnight-abyss rounded-xl p-4 border border-muted-silver/8">
-            <p className="text-xs text-dim-gray mb-1">{label}</p>
-            <p className="text-sm text-neon-cyan font-medium">{model}</p>
+                <div className="flex justify-end pt-4">
+                    <button
+                        type="submit"
+                        disabled={saving}
+                        className="btn-primary flex items-center gap-2 min-w-[160px] justify-center"
+                    >
+                        {saving ? (
+                            <div className="w-4 h-4 border-2 border-midnight-abyss border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                            <Save className="w-5 h-5" />
+                        )}
+                        <span>Lưu thay đổi</span>
+                    </button>
+                </div>
+            </form>
         </div>
     );
 }
