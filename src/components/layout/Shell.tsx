@@ -57,8 +57,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             {/* Sidebar */}
             <aside className={`
                 fixed inset-y-0 left-0 z-50 bg-[#0B111A] border-r border-white/5 
-                transition-all duration-300 ease-in-out flex flex-col shrink-0
-                lg:static lg:h-screen lg:translate-x-0
+                transform transition-all duration-300 ease-in-out flex flex-col shrink-0
+                lg:relative lg:translate-x-0
                 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                 ${isCollapsed ? 'w-20' : 'w-64'}
             `}>
