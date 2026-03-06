@@ -28,6 +28,9 @@ export async function sendTask(queue: string, data: object, options?: SendOption
  */
 export async function startWorker(queue: string, handler: (job: Job<any>) => Promise<void>) {
     const b = await getBoss();
+    // Khởi tạo queue nếu chưa tồn tại để tránh lỗi "Queue does not exist"
+    await b.createQueue(queue);
+
     await b.work(queue, async (jobs) => {
         for (const job of jobs) {
             try {
