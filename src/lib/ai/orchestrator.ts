@@ -133,7 +133,41 @@ export const AIOrchestrator = {
      */
     async runStoryboardGen() {
         // (This will eventually use the proper logic from the route but backgrounded)
-        // I'll keep the logic here consistent with the route but for now it's a placeholder
+    },
+
+    /**
+     * Chạy quy trình Novel Promotion: Story to Script
+     */
+    async runNovelStoryToScript(params: any): Promise<void> {
+        // Gửi task vào queue pg-boss để xử lý ngầm
+        const { sendTask } = await import('@/lib/task/pg-boss');
+        const task = await this.createTask({
+            projectId: params.projectId,
+            type: 'text-analysis',
+            payload: { ...params, action: 'story-to-script' }
+        });
+
+        await sendTask('novel-story-to-script', {
+            taskId: task.id,
+            ...params
+        });
+    },
+
+    /**
+     * Chạy quy trình Novel Promotion: Script to Storyboard
+     */
+    async runNovelScriptToStoryboard(params: any): Promise<void> {
+        const { sendTask } = await import('@/lib/task/pg-boss');
+        const task = await this.createTask({
+            projectId: params.projectId,
+            type: 'text-analysis',
+            payload: { ...params, action: 'script-to-storyboard' }
+        });
+
+        await sendTask('novel-script-to-storyboard', {
+            taskId: task.id,
+            ...params
+        });
     }
 };
 
