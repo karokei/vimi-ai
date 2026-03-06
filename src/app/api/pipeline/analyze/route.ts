@@ -19,13 +19,32 @@ export async function POST(req: Request) {
         if (!novelText) return NextResponse.json({ error: 'Missing novel text' }, { status: 400 });
 
         // 1. Get Project/Episode data
-        const { data: episode } = await supabase
+        let { data: episode, error: epError } = await supabase
             .from('episodes')
             .select('id')
             .eq('project_id', projectId)
-            .single();
+            .order('created_at', { ascending: true })
+            .limit(1)
+            .maybeSingle();
 
-        if (!episode) return NextResponse.json({ error: 'Episode not found' }, { status: 404 });
+        if (epError) throw epError;
+
+        if (!episode) {
+            // Auto-create episode if missing
+            const { data: newEp, error: insertErr } = await supabase
+                .from('episodes')
+                .insert({
+                    project_id: projectId,
+                    user_id: user.id,
+                    title: 'Episode 1',
+                    sequence_number: 1,
+                    novel_text: novelText
+                })
+                .select('id')
+                .single();
+            if (insertErr) throw insertErr;
+            episode = newEp;
+        }
 
         // 2. Call Gemini for analysis using the central helper
         const prompt = `
@@ -48,8 +67,20 @@ export async function POST(req: Request) {
 
         const systemInstruction = "Chỉ trả về JSON array, không giải thích gì thêm.";
 
+        // --- Fetch User Gemini Key ---
+        const { data: pref } = await supabase
+            .from('user_preferences')
+            .select('google_ai_key')
+            .eq('id', user.id)
+            .single();
+
+        const apiKey = pref?.google_ai_key;
+        if (!apiKey && !process.env.GOOGLE_AI_API_KEY) {
+            return NextResponse.json({ error: 'Missing Gemini API Key in Profile' }, { status: 400 });
+        }
+
         // Using the unified generateJSON helper from @/lib/ai/gemini
-        const clips = await generateJSON<ClipAnalysis[]>(prompt, systemInstruction);
+        const clips = await generateJSON<ClipAnalysis[]>(prompt, systemInstruction, apiKey);
 
         // 3. Clear old clips if regenerating
         await supabase.from('clips').delete().eq('episode_id', episode.id);

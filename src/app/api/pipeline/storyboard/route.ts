@@ -31,13 +31,16 @@ export async function POST(req: Request) {
             try {
                 await AIOrchestrator.updateTask(task.id, { status: 'processing', progress: 5, message: 'Đang chuẩn bị dữ liệu...' });
 
-                const { data: episode } = await supabase
+                const { data: episode, error: epError } = await supabase
                     .from('episodes')
                     .select('id')
                     .eq('project_id', projectId)
-                    .single();
+                    .order('created_at', { ascending: true })
+                    .limit(1)
+                    .maybeSingle();
 
-                if (!episode) throw new Error('Episode not found');
+                if (epError) throw epError;
+                if (!episode) throw new Error('Episode not found. Vui lòng quay lại bước kịch bản.');
 
                 const { data: clips } = await supabase
                     .from('clips')
@@ -103,7 +106,20 @@ export async function POST(req: Request) {
                 `;
 
                 const systemInstruction = "Chỉ trả về JSON array, không giải thích gì thêm.";
-                const panels = await generateJSON<PanelAnalysis[]>(prompt, systemInstruction);
+
+                // --- Fetch User Gemini Key ---
+                const { data: pref } = await supabase
+                    .from('user_preferences')
+                    .select('google_ai_key')
+                    .eq('id', user.id)
+                    .single();
+
+                const apiKey = pref?.google_ai_key;
+                if (!apiKey && !process.env.GOOGLE_AI_API_KEY) {
+                    throw new Error('Missing Gemini/Google AI Key. Please configure in Profile.');
+                }
+
+                const panels = await generateJSON<PanelAnalysis[]>(prompt, systemInstruction, apiKey);
 
                 await AIOrchestrator.updateTask(task.id, { progress: 80, message: 'Đang lưu Storyboard vào database...' });
 
@@ -117,8 +133,10 @@ export async function POST(req: Request) {
                         user_id: user.id,
                         sequence_number: p.sequence_number,
                         image_prompt: p.image_prompt,
-                        photography_rules: p.photography_rules,
-                        acting_notes: p.acting_notes,
+                        metadata: {
+                            photography_rules: p.photography_rules,
+                            acting_notes: p.acting_notes
+                        },
                         status: 'completed'
                     }));
 

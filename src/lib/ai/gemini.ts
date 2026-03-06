@@ -1,12 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
 
-// === Initialize Google AI Client ===
-const ai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_AI_API_KEY,
-});
-
-export default ai;
-
 // === Model Constants ===
 export const MODELS = {
     /** Text analysis, script creation, prompt generation */
@@ -52,11 +45,19 @@ export function getModelForCapability(capability: AICapability): string {
     return CAPABILITY_MODEL_MAP[capability];
 }
 
+function getAIClient(apiKey?: string) {
+    return new GoogleGenAI({
+        apiKey: apiKey || process.env.GOOGLE_AI_API_KEY,
+    });
+}
+
 // === Helper: Generate text content ===
 export async function generateText(
     prompt: string,
-    systemInstruction?: string
+    systemInstruction?: string,
+    apiKey?: string
 ) {
+    const ai = getAIClient(apiKey);
     const response = await ai.models.generateContent({
         model: MODELS.TEXT,
         contents: prompt,
@@ -71,7 +72,8 @@ export async function generateText(
  * Generate an image using Nano Banana 2 (Gemini 3.1 Flash Image Preview)
  * Returns the base64 data of the generated image.
  */
-export async function generateImage(prompt: string): Promise<string> {
+export async function generateImage(prompt: string, apiKey?: string): Promise<string> {
+    const ai = getAIClient(apiKey);
     const response = await ai.models.generateContent({
         model: MODELS.IMAGE,
         contents: prompt
@@ -90,8 +92,10 @@ export async function generateImage(prompt: string): Promise<string> {
 // === Helper: Generate structured JSON ===
 export async function generateJSON<T>(
     prompt: string,
-    systemInstruction?: string
+    systemInstruction?: string,
+    apiKey?: string
 ): Promise<T> {
+    const ai = getAIClient(apiKey);
     const response = await ai.models.generateContent({
         model: MODELS.TEXT,
         contents: prompt,

@@ -61,15 +61,24 @@ export default function StoryboardPage({ params }: { params: Promise<{ id: strin
 
             if (clipsData) {
                 const clipIds = clipsData.map(c => c.id);
-                const { data: panelsData } = await supabase
+                const { data: panelsRaw } = await supabase
                     .from('panels')
-                    .select('id, clip_id, sequence_number, image_prompt, image_url, photography_rules, acting_notes, status')
+                    .select('id, clip_id, sequence_number, image_prompt, image_url, metadata, status')
                     .in('clip_id', clipIds)
                     .order('sequence_number', { ascending: true });
 
+                const panelsData = (panelsRaw || []).map(p => {
+                    const meta = p.metadata as { photography_rules?: string, acting_notes?: string } | null;
+                    return {
+                        ...p,
+                        photography_rules: meta?.photography_rules || '',
+                        acting_notes: meta?.acting_notes || ''
+                    };
+                });
+
                 const clipsWithPanels = clipsData.map(clip => ({
                     ...clip,
-                    panels: panelsData?.filter(p => p.clip_id === clip.id) || []
+                    panels: panelsData.filter(p => p.clip_id === clip.id)
                 }));
 
                 setClips(clipsWithPanels);
