@@ -79,5 +79,41 @@ export const NovelPromotionDB = {
 
         if (error) throw error;
         return data;
+    },
+
+    /**
+     * Cập nhật URL ảnh cho Panel
+     */
+    async updatePanelImage(panelId: string, imageUrl: string, candidateImages: string[] | null = null) {
+        const supabase = await createClient();
+        const { data, error } = await supabase
+            .from('novel_promotion_panels')
+            .update({
+                image_url: imageUrl,
+                candidate_images: candidateImages ? JSON.stringify(candidateImages) : null
+            })
+            .eq('id', panelId)
+            .select();
+
+        if (error) throw error;
+        return data;
+    },
+
+    /**
+     * Cập nhật URL ảnh cho Character Appearance
+     */
+    async updateCharacterAppearanceImage(appearanceId: string, imageUrl: string, imageUrls: string[] = []) {
+        const supabase = await createClient();
+        const { data, error } = await supabase
+            .from('novel_promotion_character_appearances')
+            .update({
+                image_url: imageUrl,
+                image_urls: JSON.stringify(imageUrls)
+            })
+            .eq('id', appearanceId)
+            .select();
+
+        if (error) throw error;
+        return data;
     }
 };

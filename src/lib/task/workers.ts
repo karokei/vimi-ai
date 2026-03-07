@@ -104,5 +104,29 @@ export async function initializeWorkers() {
         }
     });
 
+    // 4. Worker xử lý vẽ Panel Storyboard
+    await startWorker('novel-panel-image', async (job) => {
+        const { handlePanelImageTask } = await import('@/lib/workers/image-generation');
+        await handlePanelImageTask(job);
+    });
+
+    // 5. Worker xử lý vẽ Character Sheet
+    await startWorker('novel-character-image', async (job) => {
+        const { handleCharacterImageTask } = await import('@/lib/workers/image-generation');
+        await handleCharacterImageTask(job);
+    });
+
+    // 6. Worker xử lý tạo Audio
+    await startWorker('novel-audio', async (job) => {
+        const { handleAudioTask } = await import('@/lib/workers/voice-generation');
+        await handleAudioTask(job);
+    });
+
+    // 7. Worker xử lý tạo Video
+    await startWorker('novel-video', async (job) => {
+        const { handleVideoTask } = await import('@/lib/workers/video-generation');
+        await handleVideoTask(job);
+    });
+
     console.log('[Workers] All workers started.');
 }

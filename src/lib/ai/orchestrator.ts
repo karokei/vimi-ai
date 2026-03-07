@@ -139,6 +139,10 @@ export const AIOrchestrator = {
      * Chạy quy trình Novel Promotion: Story to Script
      */
     async runNovelStoryToScript(params: any): Promise<void> {
+        if (!params.content || params.content.length < 100) {
+            throw new Error('Nội dung quá ngắn để phân tích.');
+        }
+
         // Gửi task vào queue pg-boss để xử lý ngầm
         const { sendTask } = await import('@/lib/task/pg-boss');
         const task = await this.createTask({

@@ -47,3 +47,25 @@ export type AiStepExecutionResult = {
         totalTokens: number
     }
 }
+
+export type AiVisionStepExecutionInput = {
+    userId: string
+    model: string
+    prompt: string
+    imageUrls: string[]
+    projectId?: string
+    action?: string
+    meta?: AiStepMeta
+    temperature?: number
+    reasoning?: boolean
+}
+
+export type AiVisionStepExecutionResult = {
+    text: string
+    reasoning: string
+    usage: {
+        promptTokens: number
+        completionTokens: number
+        totalTokens: number
+    }
+}

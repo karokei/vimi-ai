@@ -19,6 +19,9 @@ export const MODELS = {
 
     /** Music generation — Lyria */
     MUSIC: "lyria-realtime-exp",
+
+    /** Vision analysis */
+    VISION: "gemini-3.1-flash-preview",
 } as const;
 
 // === Capability Types ===
@@ -106,3 +109,6 @@ export async function generateJSON<T>(
     });
     return JSON.parse(response.text ?? "{}") as T;
 }
+
+const defaultGeminiClient = getAIClient();
+export default defaultGeminiClient;
