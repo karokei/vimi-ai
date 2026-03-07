@@ -143,13 +143,15 @@ export default function WorkspacePage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                     {projects.map((project) => (
-                        <Link
+                        <div
                             key={project.id}
-                            href={`/workspace/${project.id}`}
-                            className="group flex flex-col bg-surface border border-white/10 hover:border-white/20 rounded-md overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5"
+                            className="group relative flex flex-col bg-surface border border-white/10 hover:border-white/20 rounded-md overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5"
                         >
                             {/* Card Header (Thumbnail) */}
-                            <div className="w-full aspect-[16/9] bg-background relative overflow-hidden flex items-center justify-center border-b border-white/5">
+                            <Link 
+                                href={`/workspace/${project.id}`}
+                                className="w-full aspect-[16/9] bg-background relative overflow-hidden flex items-center justify-center border-b border-white/5"
+                            >
                                 {project.thumbnail_url ? (
                                     <Image
                                         src={project.thumbnail_url}
@@ -169,21 +171,20 @@ export default function WorkspacePage() {
                                         {project.status.replace('_', ' ')}
                                     </span>
                                 </div>
-
-                                {/* Hover Play Overlay */}
-                                <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors flex items-center justify-center pointer-events-none">
-                                </div>
-                            </div>
+                            </Link>
 
                             {/* Card Body */}
-                            <div className="p-4 flex flex-col flex-grow">
-                                <div className="flex items-start justify-between mb-2">
+                            <div className="p-4 flex flex-col flex-grow relative">
+                                {/* Clickable area for body */}
+                                <Link href={`/workspace/${project.id}`} className="absolute inset-0 z-0" aria-hidden="true" />
+                                
+                                <div className="flex items-start justify-between mb-2 relative z-10">
                                     <h3 className="font-semibold text-white group-hover:text-primary transition-colors line-clamp-1 pr-2" title={project.name}>
                                         {project.name}
                                     </h3>
                                     <button
                                         onClick={(e) => handleDelete(e, project.id)}
-                                        className="p-1 -mr-1 text-muted hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 outline-none"
+                                        className="p-1 -mr-1 text-muted hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 outline-none relative z-20"
                                         aria-label="Delete Project"
                                         title="Delete Project"
                                     >
@@ -191,11 +192,11 @@ export default function WorkspacePage() {
                                     </button>
                                 </div>
 
-                                <p className="text-xs text-dim-gray mb-4 line-clamp-2 min-h-[32px]">
+                                <p className="text-xs text-dim-gray mb-4 line-clamp-2 min-h-[32px] relative z-10">
                                     {project.description || "No description provided. Click to edit workspace."}
                                 </p>
 
-                                <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5">
+                                <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5 relative z-10">
                                     <div className="flex items-center gap-1.5 text-xs text-muted font-medium">
                                         <Clock className="w-3.5 h-3.5" />
                                         <span>{new Date(project.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
@@ -205,7 +206,7 @@ export default function WorkspacePage() {
                                     </div>
                                 </div>
                             </div>
-                        </Link>
+                        </div>
                     ))}
                 </div>
             )}
