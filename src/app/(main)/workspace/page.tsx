@@ -6,7 +6,9 @@ import { Plus, Video, Clock, ChevronRight, Search, X, FolderOpen, MoreVertical, 
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import CreateProjectModal from '@/components/workspace/CreateProjectModal';
+import DeleteProjectModal from '@/components/workspace/DeleteProjectModal';
 import Image from 'next/image';
+import { Trash2 } from 'lucide-react';
 
 interface Project {
     id: string;
@@ -24,6 +26,10 @@ export default function WorkspacePage() {
     const [loading, setLoading] = React.useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
 
+    // New delete states
+    const [projectToDelete, setProjectToDelete] = React.useState<Project | null>(null);
+    const [isDeleting, setIsDeleting] = React.useState(false);
+
     const fetchProjects = React.useCallback(async () => {
         const { data } = await supabase
             .from('projects')
@@ -38,19 +44,20 @@ export default function WorkspacePage() {
         fetchProjects();
     }, [fetchProjects]);
 
-    const handleDelete = async (e: React.MouseEvent, id: string) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const handleDelete = async () => {
+        if (!projectToDelete) return;
 
-        if (!confirm('Are you certain you wish to delete this project? This action cannot be undone.')) return;
+        setIsDeleting(true);
+        const { error } = await supabase.from('projects').delete().eq('id', projectToDelete.id);
 
-        const { error } = await supabase.from('projects').delete().eq('id', id);
         if (error) {
             toast.error('Deletion failed: ' + error.message);
         } else {
-            toast.success('Project deleted successfully.');
+            toast.success('Dự án đã được xóa thành công.');
             fetchProjects();
+            setProjectToDelete(null);
         }
+        setIsDeleting(false);
     };
 
     if (loading) {
@@ -69,6 +76,16 @@ export default function WorkspacePage() {
                 onClose={() => setIsCreateModalOpen(false)}
                 onSuccess={fetchProjects}
             />
+
+            {projectToDelete && (
+                <DeleteProjectModal
+                    isOpen={!!projectToDelete}
+                    onClose={() => setProjectToDelete(null)}
+                    onConfirm={handleDelete}
+                    projectName={projectToDelete.name}
+                    loading={isDeleting}
+                />
+            )}
 
             {/* Page Header (Data-Dense Dashboard Style) */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/5">
@@ -145,10 +162,10 @@ export default function WorkspacePage() {
                     {projects.map((project) => (
                         <div
                             key={project.id}
-                            className="group relative flex flex-col bg-surface border border-white/10 hover:border-white/20 rounded-md overflow-hidden transition-all hover:shadow-lg hover:-translate-y-0.5"
+                            className="group relative flex flex-col bg-surface border border-white/10 hover:border-white/20 rounded-md overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1"
                         >
                             {/* Card Header (Thumbnail) */}
-                            <Link 
+                            <Link
                                 href={`/workspace/${project.id}`}
                                 className="w-full aspect-[16/9] bg-background relative overflow-hidden flex items-center justify-center border-b border-white/5"
                             >
@@ -157,52 +174,56 @@ export default function WorkspacePage() {
                                         src={project.thumbnail_url}
                                         alt={project.name}
                                         fill
-                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                        className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
                                         unoptimized
                                     />
                                 ) : (
-                                    <Video className="w-8 h-8 text-muted/30" />
+                                    <Video className="w-8 h-8 text-muted/20 group-hover:text-primary/40 transition-colors" />
                                 )}
 
                                 {/* Status Badge Overlay */}
-                                <div className="absolute top-3 right-3 px-2 py-1 rounded bg-black/80 backdrop-blur-sm border border-white/10 shadow-sm flex items-center z-10">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-accent mr-1.5"></span>
-                                    <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+                                <div className="absolute top-3 right-3 px-2 py-1 rounded bg-black/60 backdrop-blur-md border border-white/10 shadow-sm flex items-center z-10">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-accent mr-1.5 animate-pulse"></span>
+                                    <span className="text-[10px] font-black text-white uppercase tracking-wider">
                                         {project.status.replace('_', ' ')}
                                     </span>
                                 </div>
                             </Link>
 
                             {/* Card Body */}
-                            <div className="p-4 flex flex-col flex-grow relative">
+                            <div className="p-5 flex flex-col flex-grow relative bg-gradient-to-b from-transparent to-black/20">
                                 {/* Clickable area for body */}
                                 <Link href={`/workspace/${project.id}`} className="absolute inset-0 z-0" aria-hidden="true" />
-                                
-                                <div className="flex items-start justify-between mb-2 relative z-10">
-                                    <h3 className="font-semibold text-white group-hover:text-primary transition-colors line-clamp-1 pr-2" title={project.name}>
+
+                                <div className="flex items-start justify-between mb-3 relative z-10">
+                                    <h3 className="font-bold text-white group-hover:text-primary transition-colors line-clamp-1 pr-2 text-lg" title={project.name}>
                                         {project.name}
                                     </h3>
                                     <button
-                                        onClick={(e) => handleDelete(e, project.id)}
-                                        className="p-1 -mr-1 text-muted hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 outline-none relative z-20"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            setProjectToDelete(project);
+                                        }}
+                                        className="p-2 -mr-1 text-muted hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 outline-none relative z-20 border border-transparent hover:border-red-500/20"
                                         aria-label="Delete Project"
                                         title="Delete Project"
                                     >
-                                        <X className="w-4 h-4" />
+                                        <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
 
-                                <p className="text-xs text-dim-gray mb-4 line-clamp-2 min-h-[32px] relative z-10">
+                                <p className="text-[13px] text-dim-gray mb-6 line-clamp-2 min-h-[40px] leading-relaxed relative z-10">
                                     {project.description || "No description provided. Click to edit workspace."}
                                 </p>
 
-                                <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/5 relative z-10">
-                                    <div className="flex items-center gap-1.5 text-xs text-muted font-medium">
-                                        <Clock className="w-3.5 h-3.5" />
-                                        <span>{new Date(project.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                                <div className="mt-auto flex items-center justify-between pt-4 border-t border-white/10 relative z-10">
+                                    <div className="flex items-center gap-2 text-[11px] text-muted-silver font-bold uppercase tracking-wide">
+                                        <Clock className="w-3.5 h-3.5 text-primary" />
+                                        <span>{new Date(project.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                                     </div>
                                     <div className="flex items-center">
-                                        <span className="text-[10px] uppercase font-bold tracking-wider text-muted mr-1 border border-white/5 px-1.5 py-0.5 rounded-sm bg-background/50">{project.mode.split('_')[0]}</span>
+                                        <span className="text-[10px] uppercase font-black tracking-widest text-muted-silver border border-white/10 px-2 py-0.5 rounded bg-white/5">{project.mode.split('_')[0]}</span>
                                     </div>
                                 </div>
                             </div>
