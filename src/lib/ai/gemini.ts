@@ -110,5 +110,14 @@ export async function generateJSON<T>(
     return JSON.parse(response.text ?? "{}") as T;
 }
 
-const defaultGeminiClient = getAIClient();
-export default defaultGeminiClient;
+/**
+ * Lazy-initialized default export to avoid "API key should be set" warning during import.
+ */
+const gemini = new Proxy({} as any, {
+    get(_, prop) {
+        const client = getAIClient();
+        return (client as any)[prop];
+    }
+});
+
+export default gemini;
